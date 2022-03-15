@@ -1,0 +1,85 @@
+import java.util.Random;
+import java.util.Arrays;
+
+/**
+ * File: SortTester.java
+ *
+ * Achtung, der Code dauert ca. 15 Minuten für die Ausführung!
+ */
+
+public class SortTester {
+	
+	// method for printing an integer-array
+	public static void printArray(int[] array)
+	{
+		// Ausgabe des Arrays:
+		for (int i = 0; i < array.length; i++)
+			System.out.print(array[i] + " ");
+		System.out.println("\n");
+	}
+	
+	// method-overloading for printing a long-array
+	public static void printArray(long[] array)
+	{
+		// Ausgabe des Arrays:
+		for (int i = 0; i < array.length; i++)
+			System.out.print(array[i] + " ");
+		System.out.println("\n");
+	}
+
+	public static void main(String[] args) {
+		
+		int groesse_insertion = 10000000;
+		int groesse_merge = 901;
+		
+		Timer time = new Timer();
+		Random rnd = new Random();
+		
+		long[] timearray_insertion = new long[groesse_insertion];
+		long[] timearray_merge = new long[groesse_merge];
+		long[] timearray_util = new long[groesse_merge];
+		
+		// this for-loop treats the case with insertionSort
+		for (int i = 0; i < groesse_insertion; i++) {
+			int[] array = new int[(i * 2700) + 30000];
+			for (int j = 0; j < array.length; j++) {
+				array[j] = rnd.nextInt(30000000);
+			}
+			
+			time.reset();
+			Sorting.insertionSort(array);
+			timearray_insertion[i] = time.timeElapsed();
+		}
+		
+		// this for-loop treats the case with mergeSort
+		for (int i = 0; i < groesse_merge; i++) {
+			int[] array = new int[(i * 300) + 30000];
+			for (int j = 0; j < array.length; j++) {
+				array[j] = rnd.nextInt(30000000);
+			}
+			
+			time.reset();
+			Sorting.mergeSort(array, 0, array.length - 1);
+			timearray_merge[i] = time.timeElapsed();
+		}
+		
+		// this for-loop treats the case with java.util.Arrays.sort
+				for (int i = 0; i < groesse_merge; i++) {
+					int[] array = new int[(i * 300) + 30000];
+					for (int j = 0; j < array.length; j++) {
+						array[j] = rnd.nextInt(30000000);
+					}
+					
+					time.reset();
+					Arrays.sort(array);
+					timearray_util[i] = time.timeElapsed();
+				}
+		
+		System.out.println("The first line of numbers contains the time in ms for insertionSort.\nFor insertionSort we started with 30'000 and went up to 300'000 with an increment of 300.\n");
+		printArray(timearray_insertion);
+		System.out.println("The second line of numbers contains the time in ms for mergeSort.\nFor mergeSort we started with 30'000 and went up to 300'000 with an increment of 2700.\n");
+		printArray(timearray_merge);
+		System.out.println("The third line of numbers contains the time in ms for java.util.Arrays.sort.\nFor java.util.Arrays.sort we started with 30'000 and went up to 300'000 with an increment of 900.\n");
+		printArray(timearray_util);
+	}
+}
