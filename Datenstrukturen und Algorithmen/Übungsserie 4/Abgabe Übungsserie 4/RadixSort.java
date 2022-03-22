@@ -13,9 +13,51 @@ public class RadixSort {
      * @param A an array of character arrays with different lengths
      * @param d the length of the longest String in A
      */
+	
+	public static int[] sortArrayLength(ArrayList<String> A, int d) {
+		int[] integer = new int[A.size()];
+		ArrayList<String> result = new ArrayList<String>(A.size());
+		
+		for (int i = 0; i < A.size(); i++) {
+			integer[i]= A.get(i).length();
+		}
+		
+		int[] c = new int[d];
+		
+		for (int j = 0; j < d; j++) {
+			c[j] = 0;
+		}
+		
+		for (int j = 0; j < A.size(); j++) {
+			c[integer[j]] += 1;
+		}
+		
+		for (int j = 1; j < d; j++) {
+			c[j] = c[j] + c[j - 1];
+		}
+		
+		int c_copy[] = c;
+
+		for (int j = A.size() - 1; j >= 0; j--) {
+			result.set(c[integer[j]], A.get(j));
+			c[integer[j]] -= 1;
+		}
+		
+		A = result;
+		
+		return c_copy;
+		
+	}
+	
     public static void radixSort(ArrayList<String> A, int d)
     {
-        ArrayList<LinkedList<String>> queues = new ArrayList<>();
+    	int[] c = sortArrayLength(A, d);
+    	
+    	for (int i = 0; i < A.size(); i++) {
+    		System.out.println(A.get(i));
+    	}
+    	
+        ArrayList<LinkedList<String>> queues = new ArrayList<LinkedList<String>>();
         // 27 queues for 26 characters plus 'empty' character
         for (int i=0; i<27; ++i) {
             queues.add(new LinkedList<String>());

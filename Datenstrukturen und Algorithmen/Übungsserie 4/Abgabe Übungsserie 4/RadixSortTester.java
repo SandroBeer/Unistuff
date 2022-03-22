@@ -28,8 +28,8 @@ public class RadixSortTester {
      */
     public static ArrayList<String> generateTestData(int n, int d)
     {
-        ArrayList<String> testData = new ArrayList<>(n);
-
+        ArrayList<String> testData = new ArrayList<String>(n);
+        
         for(int i=0; i<n; i++)
         {
             int len = 1+(int)Math.floor(Math.random()*d);
@@ -51,7 +51,7 @@ public class RadixSortTester {
     public static void main(String[] args) {
 
         int n[] = {10000, 20000, 40000, 80000, 160000, 320000};
-        int d = 150;
+        int d = 26;
 
         for(int i=0; i<n.length; i++)
         {
