@@ -14,47 +14,45 @@ public class RadixSort {
      * @param d the length of the longest String in A
      */
 	
-	public static int[] sortArrayLength(ArrayList<String> A, int d) {
+	public static ArrayList<String> sortArrayLength(ArrayList<String> A, int maxLength) {
+		
 		int[] integer = new int[A.size()];
-		ArrayList<String> result = new ArrayList<String>(A.size());
+		ArrayList<String> result = new ArrayList<String>();
+		result.addAll(A);
 		
 		for (int i = 0; i < A.size(); i++) {
 			integer[i]= A.get(i).length();
 		}
 		
-		int[] c = new int[d];
+		int[] C = new int[maxLength];
 		
-		for (int j = 0; j < d; j++) {
-			c[j] = 0;
+		for (int j = 0; j < maxLength; j++) {
+			C[j] = 0;
 		}
 		
 		for (int j = 0; j < A.size(); j++) {
-			c[integer[j]] += 1;
+			C[integer[j] - 1] += 1;
 		}
 		
-		for (int j = 1; j < d; j++) {
-			c[j] = c[j] + c[j - 1];
+		for (int j = 1; j < maxLength; j++) {
+			C[j] = C[j] + C[j - 1];
 		}
-		
-		int c_copy[] = c;
 
 		for (int j = A.size() - 1; j >= 0; j--) {
-			result.set(c[integer[j]], A.get(j));
-			c[integer[j]] -= 1;
+			// we have to subtract 1 because for example the largest String T with possibly the size maxLength has C[T.length - 1] = 10000 and so we have to subtract 1.
+			result.set(C[integer[j] - 1] - 1, A.get(j));
+			C[integer[j] - 1] -= 1;
 		}
 		
-		A = result;
-		
-		return c_copy;
-		
+		return result;
 	}
 	
     public static void radixSort(ArrayList<String> A, int d)
     {
-    	int[] c = sortArrayLength(A, d);
+    	ArrayList<String> A_sorted = sortArrayLength(A, d);
     	
-    	for (int i = 0; i < A.size(); i++) {
-    		System.out.println(A.get(i));
+    	for (int i = 0; i < A_sorted.size(); i++) {
+    		System.out.println(A_sorted.get(i));
     	}
     	
         ArrayList<LinkedList<String>> queues = new ArrayList<LinkedList<String>>();

@@ -50,8 +50,8 @@ public class RadixSortTester {
 
     public static void main(String[] args) {
 
-        int n[] = {10000, 20000, 40000, 80000, 160000, 320000};
-        int d = 26;
+        int n[] = {50};
+        int d = 20;
 
         for(int i=0; i<n.length; i++)
         {
