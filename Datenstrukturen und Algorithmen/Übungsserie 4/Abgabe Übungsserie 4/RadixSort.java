@@ -14,7 +14,7 @@ public class RadixSort {
      * @param d the length of the longest String in A
      */
 	
-	public static ArrayList<String> sortArrayLength(ArrayList<String> A, int maxLength) {
+	public static int[] sortByLength(ArrayList<String> A, int maxLength) {
 		
 		int[] integer = new int[A.size()];
 		ArrayList<String> result = new ArrayList<String>();
@@ -37,6 +37,8 @@ public class RadixSort {
 		for (int j = 1; j < maxLength; j++) {
 			C[j] = C[j] + C[j - 1];
 		}
+		
+		int[] C_copy = C.clone();
 
 		for (int j = A.size() - 1; j >= 0; j--) {
 			// we have to subtract 1 because for example the largest String T with possibly the size maxLength has C[T.length - 1] = 10000 and so we have to subtract 1.
@@ -44,16 +46,16 @@ public class RadixSort {
 			C[integer[j] - 1] -= 1;
 		}
 		
-		return result;
+		A.clear();
+		A.addAll(result);
+		
+		return C_copy;
 	}
 	
-    public static void radixSort(ArrayList<String> A, int d)
+    public static void radixSortImproved(ArrayList<String> A, int d)
     {
-    	ArrayList<String> A_sorted = sortArrayLength(A, d);
-    	
-    	for (int i = 0; i < A_sorted.size(); i++) {
-    		System.out.println(A_sorted.get(i));
-    	}
+    	int index_start;
+    	int[] counterArray = sortByLength(A, d);
     	
         ArrayList<LinkedList<String>> queues = new ArrayList<LinkedList<String>>();
         // 27 queues for 26 characters plus 'empty' character
@@ -64,29 +66,25 @@ public class RadixSort {
         // for all positions from right to left
         for(int j=d-1; j>=0; j--)
         {
+        	if (j == 0) {
+        		index_start = 0;
+        	}
+        	else {
+        		index_start = counterArray[j - 1];
+        	}
+        	
             // initialize empty queues
             //for(int i=0; i<27; i++) queues.set(i, new LinkedList<char[]>());
             for(int i=0; i<27; i++) queues.get(i).clear();
 
             // place each character array in correct queue
-            for(int i=0; i<A.size(); i++)
+            for(int i=index_start; i<A.size(); i++)
             {
-                if(j<A.get(i).length())
-                {
-                    // characters 'a'-'z'
-                    queues.get(A.get(i).charAt(j)-'a'+1).addLast(A.get(i));
-                }
-                else
-                {
-                    // character array is shorter than current position.
-                    // place it in 'empty' queue. 'emtpy' queue is queue 0
-                    // to get lexicographically correct results, i.e., a<ab.
-                    queues.get(0).addLast(A.get(i));
-                }
+            	queues.get(A.get(i).charAt(j)-'a'+1).addLast(A.get(i));
             }
 
             // traverse queues
-            int n = 0;
+            int n = index_start;
             for(int i=0; i<27; i++)
             {
                 while(queues.get(i).size() > 0)
