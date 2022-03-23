@@ -50,22 +50,20 @@ public class RadixSortTester {
 
     public static void main(String[] args) {
 
-        int n[] = {10};
-        int d = 5;
+        int n[] = {10000, 20000, 40000, 80000, 160000, 320000};
+        int d = 150;
 
         for(int i=0; i<n.length; i++)
         {
             ArrayList<String> testData = generateTestData(n[i], d);
 
             Timer t = new Timer();
-            /*
             t.reset();
             RadixSort.radixSort(testData, d);
             // checkSorted() messes up benchmark, only for testing correctness:
             //checkSorted(testData);
             System.out.printf("Number of elements: %d, Time: %dms\n", n[i], t.timeElapsed());
             t.reset();
-            */
             RadixSort.radixSortImproved(testData, d);
             // checkSorted() messes up benchmark, only for testing correctness:
             //checkSorted(testData);
