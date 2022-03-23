@@ -94,6 +94,10 @@ public class RadixSort {
                 }
             }
         }
+        /*//output for proof of work
+        for(int i=0; i<A.size(); i++) {
+        	System.out.println(A.get(i));
+        }*/
     }
     public static void radixSort(ArrayList<String> A, int d)
     {
