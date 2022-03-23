@@ -59,15 +59,15 @@ public class RadixSortTester {
 
             Timer t = new Timer();
             t.reset();
-            RadixSort.radixSortImproved(testData, d);
-            // checkSorted() messes up benchmark, only for testing correctness:
-            //checkSorted(testData);
-            System.out.printf("Number of elements: %d, Time(improved): %dms\n", n[i], t.timeElapsed());
-            t.reset();
             RadixSort.radixSort(testData, d);
             // checkSorted() messes up benchmark, only for testing correctness:
             //checkSorted(testData);
             System.out.printf("Number of elements: %d, Time: %dms\n", n[i], t.timeElapsed());
+            t.reset();
+            RadixSort.radixSortImproved(testData, d);
+            // checkSorted() messes up benchmark, only for testing correctness:
+            //checkSorted(testData);
+            System.out.printf("Number of elements: %d, Time(improved): %dms\n", n[i], t.timeElapsed());
         }
     }
 }
