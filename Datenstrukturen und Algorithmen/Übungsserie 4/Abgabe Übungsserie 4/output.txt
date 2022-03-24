@@ -1,0 +1,12 @@
+Number of elements: 10000, Time: 97ms
+Number of elements: 10000, Time(improved): 66ms
+Number of elements: 20000, Time: 119ms
+Number of elements: 20000, Time(improved): 70ms
+Number of elements: 40000, Time: 178ms
+Number of elements: 40000, Time(improved): 111ms
+Number of elements: 80000, Time: 672ms
+Number of elements: 80000, Time(improved): 369ms
+Number of elements: 160000, Time: 1580ms
+Number of elements: 160000, Time(improved): 948ms
+Number of elements: 320000, Time: 3543ms
+Number of elements: 320000, Time(improved): 2298ms
