@@ -2,6 +2,7 @@ import java.awt.Component;
 import java.awt.*;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -92,7 +93,23 @@ public class KDTreeVisualization extends Component{
    * starts creation of the kd-Tree
    */
   public void createKDTree(){
-	  //to be implemented
+	  kdRoot = createKD(new ArrayList<Point>(points), 0);
+  }
+  
+  private TreeNode createKD (ArrayList<Point> pts, int axis) {
+	  if (pts.size() == 0) {
+		  return null;
+	  }
+	  Collections.sort(pts, new PointComparator(axis));
+	  int mid = pts.size();
+	  while (mid+1 < pts.size() && pts.get(mid+1) == pts.get(mid))
+		  mid += 1;
+	  axis = (axis + 1) % 2;
+	  TreeNode node = new TreeNode(pts.get(mid));
+	  node.left = createKD(pts.subList(0, mid), axis);
+	  node.right = createKD(pts.subList(mid+1, pts.size()), axis);
+	  return node;
+	  
   }
     
   /**
@@ -102,8 +119,22 @@ public class KDTreeVisualization extends Component{
    * @return the nearest neighbor of p
    */
   private Point listSearchNN(Point p){
-    //to be implemented
-    return p;
+	  Iterator<Point> position = points.iterator();
+	  
+	  Point candidate = position.next();
+	  Point candidate1;
+	  double distance = p.distanceSq(candidate);
+	  double distance1;
+	  
+	  while (position.hasNext()) {
+		  candidate1 = position.next();
+		  distance1 = p.distanceSq(candidate1);
+		  if (distance1 < distance) {
+			  candidate = candidate1;
+		  }
+	  }
+	  System.out.println(candidate.x + " " + candidate.y);
+	  return candidate;
   }
   
   /**
