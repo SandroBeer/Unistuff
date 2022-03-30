@@ -93,21 +93,26 @@ public class KDTreeVisualization extends Component{
    * starts creation of the kd-Tree
    */
   public void createKDTree(){
-	  kdRoot = createKD(new ArrayList<Point>(points), 0);
+	  kdRoot = createKDHelperFunc(points, 0);
   }
   
-  private TreeNode createKD (ArrayList<Point> pts, int axis) {
+  private TreeNode createKDHelperFunc(LinkedList<Point> pts, int axis) {
 	  if (pts.size() == 0) {
 		  return null;
 	  }
 	  Collections.sort(pts, new PointComparator(axis));
-	  int mid = pts.size();
+	  int mid = pts.size() / 2;
 	  while (mid+1 < pts.size() && pts.get(mid+1) == pts.get(mid))
 		  mid += 1;
-	  axis = (axis + 1) % 2;
+	  if (axis == 0) {
+		  axis = 1;
+	  }
+	  else {
+		  axis = 0;
+	  }
 	  TreeNode node = new TreeNode(pts.get(mid));
-	  node.left = createKD(pts.subList(0, mid), axis);
-	  node.right = createKD(pts.subList(mid+1, pts.size()), axis);
+	  node.left = createKDHelperFunc(new LinkedList<Point>(pts.subList(0, mid)), axis);
+	  node.right = createKDHelperFunc(new LinkedList<Point>(pts.subList(mid+1, pts.size())), axis);
 	  return node;
 	  
   }
@@ -143,8 +148,56 @@ public class KDTreeVisualization extends Component{
    * @return the nearest neighbor of p
    */
   private Point treeSearchNN(Point p){
-    //to be implemented
+    p = treeSearchNNHelperFunc(p, kdRoot, 0, null);
     return p;
+  }
+  
+  private Point treeSearchNNHelperFunc(Point p, TreeNode node, int axis, Point candidate) {
+	  double candidate_distance = Double.POSITIVE_INFINITY;
+	  if (candidate != null) {
+		  candidate_distance = p.distanceSq(candidate);
+	  }
+	  
+	  PointComparator comp = new PointComparator(axis);
+	  
+	  if (axis == 0) {
+		  axis = 1;
+	  }
+	  else {
+		  axis = 0;
+	  }
+	  
+	  double axis_distance = comp.signedDistance(node.position, p);
+	  TreeNode include, exclude;
+	  
+	  if (axis_distance >= 0.0) {
+		  include = node.left;
+		  exclude = node.right;
+	  }
+	  else {
+		  include = node.right;
+		  exclude = node.left;
+	  }
+	  
+	  if (include != null) {
+		  candidate = treeSearchNNHelperFunc(p, include, axis, candidate);
+		  candidate_distance = p.distanceSq(candidate);
+	  }
+	  
+	  double current_node_distance = p.distanceSq(node.position);
+	  if (current_node_distance < candidate_distance) {
+		  candidate = node.position;
+		  candidate_distance = current_node_distance;
+	  }
+	  
+	  if (exclude != null) {
+		  double minimum_distance_to_exclude = axis_distance * axis_distance;
+		  if (minimum_distance_to_exclude < candidate_distance) {
+			  candidate = treeSearchNNHelperFunc(p, exclude, axis, candidate);
+		  }
+	  }
+	  
+	  return candidate;
   }
   
   /**
@@ -183,6 +236,7 @@ public class KDTreeVisualization extends Component{
       gi.fillOval(p.x-2, p.y-2,5,5);
       gi.setColor(Color.BLUE);
       gi.drawLine(old.x, old.y,p.x,p.y);
+      gi.setColor(Color.BLACK);
       old = p;
     }
     this.repaint();
@@ -210,13 +264,17 @@ public class KDTreeVisualization extends Component{
 	  if(n != null){
 		  int axis = depth%2;
 		  if(axis == 0){
-			  gi.fillOval(n.position.x-2, n.position.y-2, 5, 5);
+			  gi.setColor(Color.BLUE);
 			  gi.drawLine(n.position.x, top, n.position.x, bottom);
-			  visualize(n.left, depth+1, left, n.position.x, top, bottom);
-			  visualize(n.right, depth+1, n.position.x, right, top, bottom); 
-		  }else {
+			  gi.setColor(Color.BLACK);
 			  gi.fillOval(n.position.x-2, n.position.y-2, 5, 5);
+			  visualize(n.left, depth+1, left, n.position.x, top, bottom);
+			  visualize(n.right, depth+1, n.position.x, right, top, bottom);
+		  }else {
+			  gi.setColor(Color.RED);
 			  gi.drawLine(left, n.position.y, right, n.position.y);
+			  gi.setColor(Color.BLACK);
+			  gi.fillOval(n.position.x-2, n.position.y-2, 5, 5);
 			  visualize(n.left, depth+1, left,right , top,n.position.y);
 			  visualize(n.right, depth+1, left ,right , n.position.y, bottom);
 		  }
