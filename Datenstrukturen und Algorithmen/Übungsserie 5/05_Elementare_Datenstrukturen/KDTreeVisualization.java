@@ -96,23 +96,30 @@ public class KDTreeVisualization extends Component{
 	  kdRoot = createKDHelperFunc(points, 0);
   }
   
-  private TreeNode createKDHelperFunc(LinkedList<Point> pts, int axis) {
-	  if (pts.size() == 0) {
+  private TreeNode createKDHelperFunc(LinkedList<Point> pointset, int axis) {
+	  // if the pointset is empty, we return null for the kdRoot
+	  if (pointset.size() == 0) {
 		  return null;
 	  }
-	  Collections.sort(pts, new PointComparator(axis));
-	  int mid = pts.size() / 2;
-	  while (mid+1 < pts.size() && pts.get(mid+1) == pts.get(mid))
+	  // in the next line we sort the pointset by the parameter axis (x and y axis alternately)
+	  Collections.sort(pointset, new PointComparator(axis));
+	  int mid = pointset.size() / 2;
+	  while (mid+1 < pointset.size() && pointset.get(mid+1) == pointset.get(mid))
 		  mid += 1;
+	  
+	  // here we switch the axis with every iteration
 	  if (axis == 0) {
 		  axis = 1;
 	  }
 	  else {
 		  axis = 0;
 	  }
-	  TreeNode node = new TreeNode(pts.get(mid));
-	  node.left = createKDHelperFunc(new LinkedList<Point>(pts.subList(0, mid)), axis);
-	  node.right = createKDHelperFunc(new LinkedList<Point>(pts.subList(mid+1, pts.size())), axis);
+	  
+	  TreeNode node = new TreeNode(pointset.get(mid));
+	  
+	  // in the next two lines we call this function recursively for the left and right child node
+	  node.left = createKDHelperFunc(new LinkedList<Point>(pointset.subList(0, mid)), axis);
+	  node.right = createKDHelperFunc(new LinkedList<Point>(pointset.subList(mid+1, pointset.size())), axis);
 	  return node;
 	  
   }
@@ -124,9 +131,12 @@ public class KDTreeVisualization extends Component{
    * @return the nearest neighbor of p
    */
   private Point listSearchNN(Point p){
+	  // position is an iterator for our linked list data called points
 	  Iterator<Point> position = points.iterator();
 	  
 	  Point candidate = position.next();
+	  
+	  // candidate1 is also a Point object which holds the possibly smaller point to p
 	  Point candidate1;
 	  double distance = p.distanceSq(candidate);
 	  double distance1;
