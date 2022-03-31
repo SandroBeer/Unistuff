@@ -93,33 +93,35 @@ public class KDTreeVisualization extends Component{
    * starts creation of the kd-Tree
    */
   public void createKDTree(){
+	  //similar to the lecture, we create a recursive function "createKDHelperFunc"
 	  kdRoot = createKDHelperFunc(points, 0);
   }
   
-  private TreeNode createKDHelperFunc(LinkedList<Point> pointset, int axis) {
-	  // if the pointset is empty, we return null for the kdRoot
-	  if (pointset.size() == 0) {
+
+  private TreeNode createKDHelperFunc(LinkedList<Point> pts, int axis) {
+	  //terminate if given point set is empty
+	  if (pts.size() == 0) {
 		  return null;
 	  }
-	  // in the next line we sort the pointset by the parameter axis (x and y axis alternately)
-	  Collections.sort(pointset, new PointComparator(axis));
-	  int mid = pointset.size() / 2;
-	  while (mid+1 < pointset.size() && pointset.get(mid+1) == pointset.get(mid))
-		  mid += 1;
-	  
-	  // here we switch the axis with every iteration
+	  //sort points along x or y axis
+	  Collections.sort(pts, new PointComparator(axis));
+	  //get their median
+	  int median = pts.size() / 2;
+
+	  //cycle axis
+
 	  if (axis == 0) {
 		  axis = 1;
 	  }
 	  else {
 		  axis = 0;
 	  }
-	  
-	  TreeNode node = new TreeNode(pointset.get(mid));
-	  
-	  // in the next two lines we call this function recursively for the left and right child node
-	  node.left = createKDHelperFunc(new LinkedList<Point>(pointset.subList(0, mid)), axis);
-	  node.right = createKDHelperFunc(new LinkedList<Point>(pointset.subList(mid+1, pointset.size())), axis);
+
+	  //split tree in node, and left and right part
+	  TreeNode node = new TreeNode(pts.get(median));
+	  node.left = createKDHelperFunc(new LinkedList<Point>(pts.subList(0, median)), axis);
+	  node.right = createKDHelperFunc(new LinkedList<Point>(pts.subList(median+1, pts.size())), axis);
+
 	  return node;
 	  
   }
@@ -134,21 +136,33 @@ public class KDTreeVisualization extends Component{
 	  // position is an iterator for our linked list data called points
 	  Iterator<Point> position = points.iterator();
 	  
-	  Point candidate = position.next();
-	  
-	  // candidate1 is also a Point object which holds the possibly smaller point to p
+
+	  //define variables
+	  Point candidate = points.getFirst();
+
 	  Point candidate1;
-	  double distance = p.distanceSq(candidate);
+	  double distance = Double.POSITIVE_INFINITY;
 	  double distance1;
 	  
+	  //search point by point for the one with the shortest distance
 	  while (position.hasNext()) {
 		  candidate1 = position.next();
 		  distance1 = p.distanceSq(candidate1);
 		  if (distance1 < distance) {
+			  distance = distance1;
 			  candidate = candidate1;
 		  }
 	  }
-	  System.out.println(candidate.x + " " + candidate.y);
+	  //to guess, if result is correct (color nearest point red, to be searched points in orange)
+	  /*
+	  gi.setColor(Color.ORANGE);
+	  gi.fillOval(p.x-2, p.y-2,5,5);
+	  gi.setColor(Color.BLACK);
+	  gi.setColor(Color.RED);
+	  gi.fillOval(candidate.x-2, candidate.y-2,5,5);
+	  gi.setColor(Color.BLACK);
+	  this.repaint();
+	  */
 	  return candidate;
   }
   
@@ -158,18 +172,34 @@ public class KDTreeVisualization extends Component{
    * @return the nearest neighbor of p
    */
   private Point treeSearchNN(Point p){
-    p = treeSearchNNHelperFunc(p, kdRoot, 0, null);
-    return p;
+	Point result;
+    result = treeSearchNNHelperFunc(p, kdRoot, 0, null);
+    
+	//to guess, if result is correct (color nearest point red, to be searched points in orange)
+	/*
+	gi.setColor(Color.ORANGE);
+	gi.fillOval(p.x-2, p.y-2,5,5);
+	gi.setColor(Color.BLACK);
+	gi.setColor(Color.RED);
+	gi.fillOval(result.x-2, result.y-2,5,5);
+	gi.setColor(Color.BLACK);
+	this.repaint();
+	*/
+    return result;
   }
   
   private Point treeSearchNNHelperFunc(Point p, TreeNode node, int axis, Point candidate) {
+	  //search k-d tree for nearest point like in the lecture
 	  double candidate_distance = Double.POSITIVE_INFINITY;
+	  
+	  //skip this first time, since we don't yet have a candidate
 	  if (candidate != null) {
 		  candidate_distance = p.distanceSq(candidate);
 	  }
 	  
 	  PointComparator comp = new PointComparator(axis);
 	  
+	  //cycle axis
 	  if (axis == 0) {
 		  axis = 1;
 	  }
@@ -177,7 +207,10 @@ public class KDTreeVisualization extends Component{
 		  axis = 0;
 	  }
 	  
+	  //get distance in x or y between current node and to be searched point
 	  double axis_distance = comp.signedDistance(node.position, p);
+	  
+	  //split "branches" into one including p and one which doesn't
 	  TreeNode include, exclude;
 	  
 	  if (axis_distance >= 0.0) {
@@ -189,17 +222,21 @@ public class KDTreeVisualization extends Component{
 		  exclude = node.left;
 	  }
 	  
+	  //first, we traverse the k--d tree until we reach a "leaf"
 	  if (include != null) {
 		  candidate = treeSearchNNHelperFunc(p, include, axis, candidate);
 		  candidate_distance = p.distanceSq(candidate);
 	  }
 	  
+	  //traverse tree back from leaf to root
+	  //now get the distance between current node and point, and adapt the candidate for nearest point if necessary
 	  double current_node_distance = p.distanceSq(node.position);
 	  if (current_node_distance < candidate_distance) {
 		  candidate = node.position;
 		  candidate_distance = current_node_distance;
 	  }
 	  
+	  //check, if there could be possible closer points in the other tree part
 	  if (exclude != null) {
 		  double minimum_distance_to_exclude = axis_distance * axis_distance;
 		  if (minimum_distance_to_exclude < candidate_distance) {

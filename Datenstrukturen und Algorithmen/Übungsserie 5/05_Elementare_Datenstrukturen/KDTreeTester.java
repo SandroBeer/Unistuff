@@ -10,8 +10,8 @@ import java.awt.event.ActionListener;
  */
 public class KDTreeTester extends JFrame{
   
-  int w=3000;    //width of the window
-  int h=2000;    //height of the window
+  int w=1000;    //width of the window
+  int h=1000;    //height of the window
   int n=10000;    //number of points
   int x=100;      //number of points to be searched (has to be smaller than n)
   KDTreeVisualization vis;  //the visualization
