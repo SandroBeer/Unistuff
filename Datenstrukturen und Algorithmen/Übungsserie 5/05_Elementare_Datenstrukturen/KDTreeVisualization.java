@@ -114,7 +114,7 @@ public class KDTreeVisualization extends Component{
 	  else {
 		  axis = 0;
 	  }
-	  //split tree in node, and left and right part
+	  //split tree in node, left and right part
 	  TreeNode node = new TreeNode(pts.get(median));
 	  node.left = createKDHelperFunc(new LinkedList<Point>(pts.subList(0, median)), axis);
 	  node.right = createKDHelperFunc(new LinkedList<Point>(pts.subList(median+1, pts.size())), axis);
@@ -129,6 +129,7 @@ public class KDTreeVisualization extends Component{
    * @return the nearest neighbor of p
    */
   private Point listSearchNN(Point p){
+	  //position is an iterator for our linked list
 	  Iterator<Point> position = points.iterator();
 	  
 	  //define variables
