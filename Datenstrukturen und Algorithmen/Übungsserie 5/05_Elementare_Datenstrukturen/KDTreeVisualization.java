@@ -133,7 +133,7 @@ public class KDTreeVisualization extends Component{
    * @return the nearest neighbor of p
    */
   private Point listSearchNN(Point p){
-	  // position is an iterator for our linked list data called points
+	  //position is an iterator for our linked list
 	  Iterator<Point> position = points.iterator();
 	  
 
