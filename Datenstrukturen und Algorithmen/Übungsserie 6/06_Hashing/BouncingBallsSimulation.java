@@ -6,12 +6,12 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-	int m = 100;                // size of the hash table
-    LinkedList<Ball> balls;    // List of balls.
+	int m = 10;               // m is the size of one side of the two dimensional hash table
+    LinkedList<Ball> balls;   // List of balls.
     Image img;                // Image to display balls.
-    int w, h;                // Width an height of image.
+    int w, h;                 // Width an height of image.
     Graphics2D gi;            // Graphics object to draw balls.
-    float r;                // Radius of balls.
+    float r;                  // Radius of balls.
     int n;                    // Number of balls.
     Thread thread;            // Thread that runs simulation loop.
 
@@ -88,13 +88,16 @@ public class BouncingBallsSimulation extends Component implements Runnable {
      */
     public void run()
     {
-    	// only create the hash table once
+    	// hashTable is an ArrayList that contains m ArrayLists which contain m LinkedLists of Balls
+    	// for each simulation step, we can add all balls to the corresponding LinkedList in this two dimensional hashTable
     	ArrayList<ArrayList<LinkedList<Ball>>> hashTable = new ArrayList<ArrayList<LinkedList<Ball>>>();
     	
+    	// in this for-loop, we will add m ArrayLists to our hashTable
     	for (int i = 0; i < this.m; i++) {
     		hashTable.add(new ArrayList<LinkedList<Ball>>());
     	}
     	
+    	// in this for-loop, we will add m LinkedList (that contains balls) to all of our m ArrayLists
     	for (int i = 0; i < this.m; i++) {
     		for (int j = 0; j < this.m; j++) {
     			hashTable.get(i).add(new LinkedList<Ball>());
@@ -109,7 +112,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
         // Loop forever (or until the user closes the main window).
         while(true)
         {
-        	// clear the hash table
+        	// here we clear all the LinkedLists in order to have an empty hashTable for every other simulation step
         	for (int i = 0; i < this.m; i++) {
         		for (int j = 0; j < this.m; j++) {
         			hashTable.get(i).get(j).clear();
@@ -119,15 +122,18 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             // Run one simulation step.
             Iterator<Ball> it = balls.iterator();
             
-            // fill the hash table
-            Iterator<Ball> it2 = balls.iterator();
-            while(it2.hasNext()) {
-            	Ball ballToHash = it2.next();
-            	int ballx = (int)Math.floor(ballToHash.x * m / w);
-            	int bally = (int)Math.floor(ballToHash.y * m / w);
+            // in the next few lines, we iterate over all balls and put them in the corresponding cell of the hashTable
+            while(it.hasNext()) {
+            	Ball ballToHash = it.next();
+            	int ballX = (int)Math.floor(ballToHash.x * m / w);
+            	int ballY = (int)Math.floor(ballToHash.y * m / h);
         	
-            	hashTable.get(ballx).get(bally).add(ballToHash);
+            	hashTable.get(ballX).get(ballY).add(ballToHash);
             }
+            // now the hashTable is ready for this simulation step
+            // we have to reassign the iterator in order to iterate over all balls
+            it = balls.iterator();
+            
             // Iterate over all balls.
             while(it.hasNext())
             {
@@ -146,33 +152,41 @@ public class BouncingBallsSimulation extends Component implements Runnable {
                 if(ball.doesCollide(0.f,0.f,0.f,1.f))
                     ball.resolveCollision(0.f,0.f,0.f,1.f);
                 
-                // Handle collisions with other balls hashVersion
-                int ballx = (int)Math.floor(ball.x * m / w);
-            	int bally = (int)Math.floor(ball.y * m / h);
-            	//treat cases where ball in a hash on an edge
-            	int xmin = ballx - 1, xmax = ballx + 1, ymin = bally - 1, ymax = bally + 1;
-            	if(ballx==0) {
-            		xmin = ballx;
+                // handle collisions with other balls (hashVersion)
+                int ballX = (int)Math.floor(ball.x * m / w);
+            	int ballY = (int)Math.floor(ball.y * m / h);
+            	
+            	// here we assign a few variables that we can join all LinkedLists of neighboring cells later
+            	int xmin = ballX - 1, xmax = ballX + 1, ymin = ballY - 1, ymax = ballY + 1;
+            	
+            	// treat cases where ball is either on the edge or in a corner
+            	if (ballX == 0) {
+            		xmin = ballX;
             	}
-            	else if(ballx == m-1) {
-            		xmax = ballx;
+            	else if (ballX == m - 1) {
+            		xmax = ballX;
             	}
-            	if(bally==0) {
-            		ymin = bally;
+            	if (ballY == 0) {
+            		ymin = ballY;
             	}
-            	else if(bally == m-1) {
-            		ymax = bally;
+            	else if (ballY == m - 1) {
+            		ymax = ballY;
             	}
             	
+            	// possibleCollisions is a LinkedList of Balls that contains the cell of the ball which is being iterated over
+            	// and as well all neighboring cells
             	LinkedList<Ball> possibleCollisions = new LinkedList<Ball>();
-            	for (int i = xmin; i < xmax+1; i++) {
-            		for (int j = ymin; j < ymax+1; j++) {
+            	for (int i = xmin; i < xmax + 1; i++) {
+            		for (int j = ymin; j < ymax + 1; j++) {
             			possibleCollisions.addAll(hashTable.get(i).get(j));
             		}
             	}
+            	
             	Iterator<Ball> ballIt = possibleCollisions.iterator();
+            	// in this while-loop we iterate over all all balls in the LinkeList possibleCollisions
             	while (ballIt.hasNext()) {
             		Ball ballToTest = ballIt.next();
+            		// we don't want to test a collision of a ball with itself
             		if(ballToTest == ball) {
             			continue;
             		}
@@ -182,6 +196,8 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             			}
             		}
             	}
+            	// in the next few lines, you can find the old version of how collisions are treated with other balls
+            	
             	/*
                 // Handle collisions with other balls.
                 Iterator<Ball> it2 = balls.iterator();
