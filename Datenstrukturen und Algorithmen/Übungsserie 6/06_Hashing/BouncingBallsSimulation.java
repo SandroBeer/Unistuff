@@ -6,7 +6,7 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-	int m = 250;               // m is the size of one side of the two dimensional hash table
+	int m = 10;               // m is the size of one side of the two dimensional hash table
     LinkedList<Ball> balls;   // List of balls.
     Image img;                // Image to display balls.
     int w, h;                 // Width an height of image.
@@ -30,6 +30,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
         this.n = n;
         this.w = w;
         this.h = h;
+        
 
         // Initialize balls by distributing them randomly.
         balls = new LinkedList<Ball>();
@@ -42,6 +43,11 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             vy = vy/tmp*v;
             int color = (i < n / 100 ) ? 1 : 0;
             balls.add(new Ball(r+(float)Math.random()*(w-2*r), r+(float)Math.random()*(h-2*r), vx, vy, r, color));
+            
+            //check, if balls are able to go to far
+            if(true || h/m <= vy ) {
+            	System.out.printf("Danger, the Ball is fast enough to go to Squares further than one Square away from his origin");
+            }
         }
 
     }
@@ -173,7 +179,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             	// here we assign a few variables that we can join all LinkedLists of neighboring cells later
             	int xmin = ballX - 1, xmax = ballX + 1, ymin = ballY - 1, ymax = ballY + 1;
             	
-            	// treat cases where ball is either on the edge or in a corner (same as on line 131)
+            	// treat cases where ball is either on the edge or in a corner (same as on line 136)
             	if (ballX <= 0) {
             		xmin = ballX;
             	}
