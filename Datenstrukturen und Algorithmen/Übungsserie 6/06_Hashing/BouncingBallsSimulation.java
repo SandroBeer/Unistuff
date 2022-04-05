@@ -43,11 +43,6 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             vy = vy/tmp*v;
             int color = (i < n / 100 ) ? 1 : 0;
             balls.add(new Ball(r+(float)Math.random()*(w-2*r), r+(float)Math.random()*(h-2*r), vx, vy, r, color));
-            
-            //check, if balls are able to go to far
-            if(true || h/m <= vy ) {
-            	System.out.printf("Danger, the Ball is fast enough to go to Squares further than one Square away from his origin");
-            }
         }
 
     }
@@ -158,6 +153,12 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             while(it.hasNext())
             {
                 Ball ball = it.next();
+                
+              //check, if balls are able to go to far
+                if(w/this.m <= ball.vx || h/this.m <= ball.vy) {
+                	System.out.printf("Danger, the Ball is fast enough to go to Squares further than one Square away from his origin\n");
+                	break;
+                	}
 
                 // Move the ball.
                 ball.move();
