@@ -6,7 +6,7 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-
+	int m = 100;                // size of the hash table
     LinkedList<Ball> balls;    // List of balls.
     Image img;                // Image to display balls.
     int w, h;                // Width an height of image.
@@ -88,6 +88,19 @@ public class BouncingBallsSimulation extends Component implements Runnable {
      */
     public void run()
     {
+    	// only create the hash table once
+    	ArrayList<ArrayList<LinkedList<Ball>>> hashTable = new ArrayList<ArrayList<LinkedList<Ball>>>();
+    	
+    	for (int i = 0; i < this.m; i++) {
+    		hashTable.add(new ArrayList<LinkedList<Ball>>());
+    	}
+    	
+    	for (int i = 0; i < this.m; i++) {
+    		for (int j = 0; j < this.m; j++) {
+    			hashTable.get(i).add(new LinkedList<Ball>());
+    		}
+    	}
+    	
         // Set up timer.
         int c = 0;
         Timer timer = new Timer();
@@ -96,9 +109,25 @@ public class BouncingBallsSimulation extends Component implements Runnable {
         // Loop forever (or until the user closes the main window).
         while(true)
         {
+        	// clear the hash table
+        	for (int i = 0; i < this.m; i++) {
+        		for (int j = 0; j < this.m; j++) {
+        			hashTable.get(i).get(j).clear();
+        		}
+        	}
+        	
             // Run one simulation step.
             Iterator<Ball> it = balls.iterator();
-
+            
+            // fill the hash table
+            Iterator<Ball> it2 = balls.iterator();
+            while(it2.hasNext()) {
+            	Ball ballToHash = it2.next();
+            	int ballx = (int)Math.floor(ballToHash.x * m / w);
+            	int bally = (int)Math.floor(ballToHash.y * m / w);
+        	
+            	hashTable.get(ballx).get(bally).add(ballToHash);
+            }
             // Iterate over all balls.
             while(it.hasNext())
             {
@@ -116,7 +145,44 @@ public class BouncingBallsSimulation extends Component implements Runnable {
                     ball.resolveCollision(0.f,(float)h,0.f,-1.f);
                 if(ball.doesCollide(0.f,0.f,0.f,1.f))
                     ball.resolveCollision(0.f,0.f,0.f,1.f);
-
+                
+                // Handle collisions with other balls hashVersion
+                int ballx = (int)Math.floor(ball.x * m / w);
+            	int bally = (int)Math.floor(ball.y * m / h);
+            	//treat cases where ball in a hash on an edge
+            	int xmin = ballx - 1, xmax = ballx + 1, ymin = bally - 1, ymax = bally + 1;
+            	if(ballx==0) {
+            		xmin = ballx;
+            	}
+            	else if(ballx == m-1) {
+            		xmax = ballx;
+            	}
+            	if(bally==0) {
+            		ymin = bally;
+            	}
+            	else if(bally == m-1) {
+            		ymax = bally;
+            	}
+            	
+            	LinkedList<Ball> possibleCollisions = new LinkedList<Ball>();
+            	for (int i = xmin; i < xmax+1; i++) {
+            		for (int j = ymin; j < ymax+1; j++) {
+            			possibleCollisions.addAll(hashTable.get(i).get(j));
+            		}
+            	}
+            	Iterator<Ball> ballIt = possibleCollisions.iterator();
+            	while (ballIt.hasNext()) {
+            		Ball ballToTest = ballIt.next();
+            		if(ballToTest == ball) {
+            			continue;
+            		}
+            		else {
+            			if(ball.doesCollide(ballToTest)) {
+            				ball.resolveCollision(ballToTest);
+            			}
+            		}
+            	}
+            	/*
                 // Handle collisions with other balls.
                 Iterator<Ball> it2 = balls.iterator();
                 Ball ball2 = it2.next();
@@ -125,7 +191,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
                     if(ball.doesCollide(ball2))
                         ball.resolveCollision(ball2);
                     ball2 = it2.next();
-                }
+                }*/
             }
 
             // Trigger update of display.
