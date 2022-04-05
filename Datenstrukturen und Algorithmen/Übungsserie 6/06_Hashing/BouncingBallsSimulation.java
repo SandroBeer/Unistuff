@@ -6,7 +6,7 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-	int m = 10;               // m is the size of one side of the two dimensional hash table
+	int m = 100;               // m is the size of one side of the two dimensional hash table
     LinkedList<Ball> balls;   // List of balls.
     Image img;                // Image to display balls.
     int w, h;                 // Width an height of image.
@@ -125,8 +125,8 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             // in the next few lines, we iterate over all balls and put them in the corresponding cell of the hashTable
             while(it.hasNext()) {
             	Ball ballToHash = it.next();
-            	int ballX = (int)Math.floor(ballToHash.x * m / w);
-            	int ballY = (int)Math.floor(ballToHash.y * m / h);
+            	int ballX = (int)Math.floor(ballToHash.x * this.m / w);
+            	int ballY = (int)Math.floor(ballToHash.y * this.m / h);
         	
             	hashTable.get(ballX).get(ballY).add(ballToHash);
             }
@@ -153,8 +153,8 @@ public class BouncingBallsSimulation extends Component implements Runnable {
                     ball.resolveCollision(0.f,0.f,0.f,1.f);
                 
                 // handle collisions with other balls (hashVersion)
-                int ballX = (int)Math.floor(ball.x * m / w);
-            	int ballY = (int)Math.floor(ball.y * m / h);
+                int ballX = (int)Math.floor(ball.x * this.m / w);
+            	int ballY = (int)Math.floor(ball.y * this.m / h);
             	
             	// here we assign a few variables that we can join all LinkedLists of neighboring cells later
             	int xmin = ballX - 1, xmax = ballX + 1, ymin = ballY - 1, ymax = ballY + 1;
@@ -163,13 +163,13 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             	if (ballX == 0) {
             		xmin = ballX;
             	}
-            	else if (ballX == m - 1) {
+            	else if (ballX == this.m - 1) {
             		xmax = ballX;
             	}
             	if (ballY == 0) {
             		ymin = ballY;
             	}
-            	else if (ballY == m - 1) {
+            	else if (ballY == this.m - 1) {
             		ymax = ballY;
             	}
             	
