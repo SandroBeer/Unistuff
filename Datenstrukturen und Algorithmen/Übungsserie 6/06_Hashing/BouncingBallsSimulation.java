@@ -6,7 +6,7 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-	int m = 10;               // m is the size of one side of the two dimensional hash table
+	int m = 250;               // m is the size of one side of the two dimensional hash table
     LinkedList<Ball> balls;   // List of balls.
     Image img;                // Image to display balls.
     int w, h;                 // Width an height of image.
@@ -127,6 +127,20 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             	Ball ballToHash = it.next();
             	int ballX = (int)Math.floor(ballToHash.x * this.m / w);
             	int ballY = (int)Math.floor(ballToHash.y * this.m / h);
+            	
+            	// treat cases where ball is either on the edge or in a corner
+            	if (ballX <= 0) {
+            		ballX = 0;
+            	}
+            	else if (ballX >= this.m - 1) {
+            		ballX = this.m - 1;
+            	}
+            	if (ballY <= 0) {
+            		ballY = 0;
+            	}
+            	else if (ballY >= this.m - 1) {
+            		ballY = this.m - 1;
+            	}
         	
             	hashTable.get(ballX).get(ballY).add(ballToHash);
             }
@@ -159,17 +173,17 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             	// here we assign a few variables that we can join all LinkedLists of neighboring cells later
             	int xmin = ballX - 1, xmax = ballX + 1, ymin = ballY - 1, ymax = ballY + 1;
             	
-            	// treat cases where ball is either on the edge or in a corner
-            	if (ballX == 0) {
+            	// treat cases where ball is either on the edge or in a corner (same as on line 131)
+            	if (ballX <= 0) {
             		xmin = ballX;
             	}
-            	else if (ballX == this.m - 1) {
+            	else if (ballX >= this.m - 1) {
             		xmax = ballX;
             	}
-            	if (ballY == 0) {
+            	if (ballY <= 0) {
             		ymin = ballY;
             	}
-            	else if (ballY == this.m - 1) {
+            	else if (ballY >= this.m - 1) {
             		ymax = ballY;
             	}
             	
@@ -217,7 +231,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             c++;
             if(c==10)
             {
-                System.out.printf("Timer per simulation step: %fms\n", (float)timer.timeElapsed()/(float)c);
+                System.out.printf("Timer per simulation step: %.3fms\n", (float)timer.timeElapsed()/(float)c);
                 timer.reset();
                 c = 0;
             }
