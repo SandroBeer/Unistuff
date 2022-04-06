@@ -30,6 +30,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
         this.n = n;
         this.w = w;
         this.h = h;
+        
 
         // Initialize balls by distributing them randomly.
         balls = new LinkedList<Ball>();
@@ -125,8 +126,23 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             // in the next few lines, we iterate over all balls and put them in the corresponding cell of the hashTable
             while(it.hasNext()) {
             	Ball ballToHash = it.next();
-            	int ballX = (int)Math.floor(ballToHash.x * (this.m - 1) / w);
-            	int ballY = (int)Math.floor(ballToHash.y * (this.m - 1) / h);
+
+            	int ballX = (int)Math.floor(ballToHash.x * this.m / w);
+            	int ballY = (int)Math.floor(ballToHash.y * this.m / h);
+            	
+            	// treat cases where ball is either on the edge or in a corner
+            	if (ballX <= 0) {
+            		ballX = 0;
+            	}
+            	else if (ballX >= this.m - 1) {
+            		ballX = this.m - 1;
+            	}
+            	if (ballY <= 0) {
+            		ballY = 0;
+            	}
+            	else if (ballY >= this.m - 1) {
+            		ballY = this.m - 1;
+            	}
         	
             	hashTable.get(ballX).get(ballY).add(ballToHash);
             }
@@ -138,6 +154,12 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             while(it.hasNext())
             {
                 Ball ball = it.next();
+                
+              //check, if balls are able to go to far
+                if(w/this.m <= ball.vx || h/this.m <= ball.vy) {
+                	System.out.printf("Danger, the Ball is fast enough to go to Squares further than one Square away from his origin\n");
+                	break;
+                	}
 
                 // Move the ball.
                 ball.move();
@@ -159,17 +181,17 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             	// here we assign a few variables that we can join all LinkedLists of neighboring cells later
             	int xmin = ballX - 1, xmax = ballX + 1, ymin = ballY - 1, ymax = ballY + 1;
             	
-            	// treat cases where ball is either on the edge or in a corner
-            	if (ballX == 0) {
+            	// treat cases where ball is either on the edge or in a corner (same as on line 136)
+            	if (ballX <= 0) {
             		xmin = ballX;
             	}
-            	else if (ballX == this.m - 1) {
+            	else if (ballX >= this.m - 1) {
             		xmax = ballX;
             	}
-            	if (ballY == 0) {
+            	if (ballY <= 0) {
             		ymin = ballY;
             	}
-            	else if (ballY == this.m - 1) {
+            	else if (ballY >= this.m - 1) {
             		ymax = ballY;
             	}
             	
@@ -217,7 +239,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             c++;
             if(c==10)
             {
-                System.out.printf("Timer per simulation step: %fms\n", (float)timer.timeElapsed()/(float)c);
+                System.out.printf("Timer per simulation step: %.3fms\n", (float)timer.timeElapsed()/(float)c);
                 timer.reset();
                 c = 0;
             }
