@@ -6,7 +6,7 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-	int m = 800;               // m is the size of one side of the two dimensional hash table
+	int m = 100;               // m is the size of one side of the two dimensional hash table
     LinkedList<Ball> balls;   // List of balls.
     Image img;                // Image to display balls.
     int w, h;                 // Width an height of image.
@@ -43,6 +43,10 @@ public class BouncingBallsSimulation extends Component implements Runnable {
             vy = vy/tmp*v;
             int color = (i < n / 100 ) ? 1 : 0;
             balls.add(new Ball(r+(float)Math.random()*(w-2*r), r+(float)Math.random()*(h-2*r), vx, vy, r, color));
+        }
+        //consistency
+        if(w/m <= r) {
+        	System.out.println("Warning, hash cell is smaller than radius of ball");
         }
 
     }
@@ -89,6 +93,7 @@ public class BouncingBallsSimulation extends Component implements Runnable {
      */
     public void run()
     {
+    	
     	// hashTable is an ArrayList that contains m ArrayLists which contain m LinkedLists of Balls
     	// for each simulation step, we can add all balls to the corresponding LinkedList in this two dimensional hashTable
     	ArrayList<ArrayList<LinkedList<Ball>>> hashTable = new ArrayList<ArrayList<LinkedList<Ball>>>();
