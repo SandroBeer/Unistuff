@@ -6,7 +6,7 @@ import java.util.*;
  * Implements a bouncing ball simulation.
  */
 public class BouncingBallsSimulation extends Component implements Runnable {
-	int m = 100;               // m is the size of one side of the two dimensional hash table
+	int m = 75;               // m is the size of one side of the two dimensional hash table
     LinkedList<Ball> balls;   // List of balls.
     Image img;                // Image to display balls.
     int w, h;                 // Width an height of image.
