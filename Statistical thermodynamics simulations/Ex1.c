@@ -13,16 +13,7 @@ long long big_rand(){
   return llabs(result); //result is in range of 0 to 10^12-1
 }
 
-//exponantial sum function
-double exp_sum(long long min, long long max, double a, double b){
-  double i;
-  double sum=0;
-  for(i=min; i<max+1; i++){
-    sum += a*exp(b*i);
-  }
-  return sum;
-}
-
+//sum of form k^exponent*a*e^b
 double i_to_pow_times_exp_sum(long long min, long long max, int exponent, double a, double b){
   double i;
   double sum=0;
@@ -56,9 +47,7 @@ int main(){
   //prepare the simulation
   beta_epsilon = beta*epsilon;
   double q = 1. / (1+exp(beta_epsilon)); //probability for transition step n -> n+1
-  long long *count; //add array, wich counts, how many times the particle visited each ladder-steps
-  count = (long long*) malloc ((n+1) * sizeof(long long));
-  memset(count, 0, (n+1) * sizeof(long long)); //initialize array count with 0's
+  long long *count = calloc (n+1, sizeof(long long)); //add array, wich counts, how many times the particle visited each ladder-steps
 
   //run simulation
   //set particle on a random steps
@@ -87,8 +76,7 @@ int main(){
     //calculations
     //calculate the equilibrium probability
     double x = q / (1-q);
-    double *rho;
-    rho = (double*) malloc ((n+1) * sizeof(double));
+    double *rho = calloc(n+1, sizeof(double));
     //first, calculate rho_0 (similar to Ex.4 Home1)
     double rho_0 = (1-x) / (1-pow(x,n+1)); //using the geometric series we get
 
@@ -115,9 +103,10 @@ int main(){
 
     //calculate the theoretical energy <H> and the standart deviation <dH>
     //first we calculate some useful sums
-    double z = exp_sum(0, n-1 , 1., -beta_epsilon);
-    double dz = i_to_pow_times_exp_sum(1, n-1, 1, -epsilon, -beta_epsilon);
-    double ddz = i_to_pow_times_exp_sum(1, n-1, 2, pow(epsilon,2), -beta_epsilon);
+    double e_be = exp(-beta_epsilon);
+    double z = (1-pow(e_be, n+1)) / (1-e_be);
+    double dz = i_to_pow_times_exp_sum(1, n, 1, -epsilon, -beta_epsilon);
+    double ddz = i_to_pow_times_exp_sum(1, n, 2, pow(epsilon,2), -beta_epsilon);
 
     double h = -1. / z * dz; // <H>
     double dh = sqrt(1. / z * ddz -1. / pow(z,2) * pow(dz,2)); //<dH>
@@ -129,7 +118,7 @@ int main(){
     }
     printf("\n");
     printf("avg E: \t\t%.6lf \t%.6lf \n", avg_e_sim, h);
-    printf("std E: \t\t%.6lf \t%.6lf", std_e_sim, dh);
+    printf("std E: \t\t%.6lf \t%.6lf\n", std_e_sim, dh);
 
   return 0;
 }

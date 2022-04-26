@@ -12,26 +12,26 @@ long long big_rand(){
   result += rand() % 10000;
   result += 10000 * (rand() % 10000);
   result += 100000000 * (rand() % 10000);
-  return llabs(result); //result is in range of 0 to 10^125555-1
+  return llabs(result); //result is in range of 0 to 10^12-1
 }
 
 //define average function
-double ladder_avg(long long *array, long long length){
+double ladder_avg(long long *array, long long length_of_array, long long tot_part){
   double result = 0;
-  for(i=0; i < length; i++){
+  for(i=0; i < length_of_array; i++){
     result += array[i] * i;
   }
-  result /= length;
+  result /= tot_part;
   return result;
 }
 
 //define std function
-double ladder_std(long long *array, long long length, long long part_number){
-  double result = 0, avg = ladder_avg(array, length);
+double ladder_std(long long *array, long long length, long long tot_part){
+  double result = 0, avg = ladder_avg(array, length, tot_part);
   for(i=0; i < length; i++){
     result += array[i] * pow(i-avg,2);
   }
-  result = sqrt(result / (part_number-1));
+  result = sqrt(result / (tot_part-1));
   return result;
 }
 
@@ -59,14 +59,15 @@ int main(){
 
   //place particles on ladder steps
   long long to_be_distributed_m = m; //account the energy e, wich can still be distributed
-  long long e_for_particle = m/n; //energy for current particle
+  long long e_for_particle; //energy for current particle
+  long long avg_e = m/n +1;
 
   for(i=0; i < n-1; i++){
+    e_for_particle = rand() % avg_e + rand() % avg_e;
     position[i] = e_for_particle;//e_for_particle;
     to_be_distributed_m -= e_for_particle; //subtract energy given to particle from to be distributed energy
   }
   position[n-1] = to_be_distributed_m; //make sure, that all the energy gets distributed
-
 
   //run simulation
   for(i=0; i < iter; i++){
@@ -90,7 +91,7 @@ int main(){
   }
 
   //calcualtions
-  //calculate the theoretical particle density
+  //calculate the theoretical particle density for a microcanonical ensemble
   long long *part_density;
   part_density = (long long*) malloc (m * sizeof(long long));
   part_density[0] = (n-1)*1. / (m+n-1) * n; //particle density at ground level
@@ -99,25 +100,36 @@ int main(){
     part_density[i] = part_density[i-1] * (m+1-i)*1. / (m+n-1-i); //calculate expected particles per ladder step
   }
 
-  //calculate the average height and standart deviation of said height for the simulated particles
-  double avg_h_sim = ladder_avg(num_of_part, m);
+  //calculate the average height, and standart deviation of said height for the simulated particles
+  double avg_h_sim = ladder_avg(num_of_part, m, n);
   double std_h_sim = ladder_std(num_of_part, m, n);
 
   //and for the theoretiical values
-  double avg_h_thry = ladder_avg(part_density, m);
+  double avg_h_thry = ladder_avg(part_density, m, n);
   double std_h_thry = ladder_std(part_density, m, n);
-
 
   //output
   printf("\n");
   printf("\t\tsimulated: \t  theory: \n");
-  for(i=0; i<30; i++){
+  for(i=0; i<26; i++){
     printf("Step %2lld: \t%9lld \t%9lld \n",i, num_of_part[i], part_density[i]);
   }
 
   printf("\n");
   printf("avg heigth: \t%9.7lf \t%9.7lf \n", avg_h_sim, avg_h_thry);
   printf("std heigth: \t%9.6lf \t%9.6lf \n", std_h_sim, std_h_thry);
+  //and theory for the first 10 steps:
+  printf("\n");
+  printf("Now for the first 10 steps: \n");
+
+  //count, how many particles there are up t the 10th step:
+  long long step_10_sim=0, step_10_thry=0;
+  for(i=0; i < 11; i++){
+    step_10_sim += num_of_part[i];
+    step_10_thry += part_density[i];
+  }
+  printf("avg heigth: \t%9.7lf \t%9.7lf \n", ladder_avg(num_of_part, 11, step_10_sim), ladder_avg(part_density, 11, step_10_thry));
+  printf("std heigth: \t%9.6lf \t%9.6lf \n", ladder_std(num_of_part, 11, step_10_sim), ladder_std(part_density, 11, step_10_thry));
 
   free(position), free(num_of_part), free(part_density);
   return 0;
