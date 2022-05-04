@@ -22,7 +22,26 @@ public class SeamCarving {
         int height = img.getHeight();
         var costs = new float[width][height];
 
-        // To be implemented.
+        // initialize the first row with the corresponding values of the energy function
+        for (int x = 0; x < width; x++) {
+        	costs[x][0] = energy(img, x, 0);
+        }
+        
+        // calculate the rest of the table with dynamic programming
+        for (int y = 1; y < height; y++) {
+        	for (int x = 0; x < width; x++) {
+        		if (x == 0) {
+        			costs[x][y] = energy(img, x, y) + Math.min(costs[x][y - 1], costs[x + 1][y - 1]);
+        		}
+        		else if (x == width - 1) {
+        			costs[x][y] = energy(img, x, y) + Math.min(costs[x - 1][y - 1], costs[x][y - 1]);
+        		}
+        		else {
+        			costs[x][y] = energy(img, x, y) + Math.min(costs[x - 1][y - 1], Math.min(costs[x][y - 1], costs[x + 1][y - 1]));
+        		}
+        	}
+        }
+        
         return costs;
     }
 
@@ -39,7 +58,53 @@ public class SeamCarving {
     public static int[] computeSeam(float[][] costs, int width, int height)
     {
         var seam = new int[height];
-        // To be implemented.
+        float minimum = costs[0][height - 1];
+        int row_index = 0;
+        
+        // choose the pixel with the lowest energy from the last row of the table
+        for (int x = 1; x < width; x++) {
+        	if (costs[x][height - 1] < minimum) {
+        		minimum = costs[x][height - 1];
+        		row_index = x;
+        	}
+        }
+        seam[height - 1] = row_index;
+        
+        for (int y = height - 2; y > -1; y--) {
+        	if (row_index == 0) {
+        		if (costs[row_index][y] < costs[row_index + 1][y]) {
+        			seam[y] = row_index;
+        		}
+        		else {
+        			seam[y] = row_index + 1;
+        			row_index++;
+        		}
+        	}
+        	else if (row_index == width - 1) {
+        		if (costs[row_index - 1][y] < costs[row_index][y]) {
+        			seam[y] = row_index - 1;
+        			row_index--;
+        		}
+        		else {
+        			seam[y] = row_index;
+        		}
+        	}
+        	else {
+        		minimum = Math.min(costs[row_index - 1][y], Math.min(costs[row_index][y], costs[row_index + 1][y]));
+        		if (minimum == costs[row_index - 1][y]) {
+        			seam[y] = row_index - 1;
+        			row_index--;
+        		}
+        		else if (minimum == costs[row_index][y]) {
+        			seam[y] = row_index;
+        		}
+        		else {
+        			seam[y] = row_index + 1;
+        			row_index++;
+        		}
+        	}
+        }
+
         return seam;
     }
 
@@ -165,7 +230,7 @@ public class SeamCarving {
         int seam[];
 
         try {
-            img = ImageIO.read(new File("test.jpg"));
+            img = ImageIO.read(new File("test1.jpg"));
         } catch(Exception e)
         {
             System.out.printf("Could not read image file!\n");
