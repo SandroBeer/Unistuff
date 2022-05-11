@@ -8,22 +8,30 @@ public class HuffmanCode {
 								   // isn't in the input-String
 	
 	public static void main(String[] args) {
+		String output;
+		float zeichen, bits;
 		HuffmanCode code = new HuffmanCode();
 		Scanner scan = new Scanner(System.in);
 		System.out.println("This program converts a given input String into huffman code. Please enter your input:");
 		String input = scan.nextLine();
 		scan.close();
-		System.out.println("Thanks, your given input in huffman code gives the following ouput (whitespaces are just for better reading):");
-		code.printCode(input);
+		System.out.println("Thanks, your given input in huffman code gives the following ouput:");
+		output = code.printCode(input);
+		System.out.println(output);
+		zeichen = input.length();
+		bits = output.length();
+		System.out.println("The average number of bits per character is " + (bits / zeichen) + " for your input.");
 		
 	}
 	
 	// method for printing the code in the console
-	public void printCode(String input) {
+	public String printCode(String input) {
+		String output = "";
 		this.prefixCode(input);
 		for (int i = 0; i < input.length(); i++) {
-			System.out.print(this.encode(input.charAt(i)) + " ");
+			output += (this.encode(input.charAt(i)));
 		}
+		return output;
 	}
 	
 	// method that generates a huffman code to the input-String
