@@ -230,7 +230,7 @@ public class SeamCarving {
         int seam[];
 
         try {
-            img = ImageIO.read(new File("test1.jpg"));
+            img = ImageIO.read(new File("test3.jpg"));
         } catch(Exception e)
         {
             System.out.printf("Could not read image file!\n");
